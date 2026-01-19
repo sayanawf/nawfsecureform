@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nawf Access</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ['"Share Tech Mono"', 'monospace'],
+              sans: ['"Rajdhani"', 'sans-serif'],
+            },
+            colors: {
+              cyber: {
+                black: '#050505',
+                dark: '#0a0a12',
+                panel: '#11111a',
+                primary: '#00f3ff', // Cyan
+                secondary: '#bc13fe', // Purple
+                dim: 'rgba(0, 243, 255, 0.1)',
+                text: '#e0e0e0',
+              }
+            },
+            backgroundImage: {
+              'grid-pattern': "linear-gradient(to right, #1f2937 1px, transparent 1px), linear-gradient(to bottom, #1f2937 1px, transparent 1px)",
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505;
+        color: #e0e0e0;
+        overflow-x: hidden;
+      }
+      /* Custom Scrollbar for Disclaimer */
+      .cyber-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .cyber-scrollbar::-webkit-scrollbar-track {
+        background: #0a0a12;
+      }
+      .cyber-scrollbar::-webkit-scrollbar-thumb {
+        background: #00f3ff;
+      }
+      .cyber-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #bc13fe;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "gsap": "https://esm.sh/gsap@^3.14.2"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
