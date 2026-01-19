@@ -180,7 +180,7 @@ export const EntryView: React.FC<EntryViewProps> = ({ onSubmit }) => {
                </p>
 
                <p className="text-cyber-primary mt-6">
-                 >> SCROLL TO BOTTOM TO CONFIRM ACKNOWLEDGEMENT
+                 &gt;&gt; SCROLL TO BOTTOM TO CONFIRM ACKNOWLEDGEMENT
                </p>
                <div className="h-8"></div>
              </div>
