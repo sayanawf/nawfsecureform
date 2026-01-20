@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
-import { ShieldAlert, ChevronDown, Check, Lock, Terminal } from 'lucide-react';
+import { ShieldAlert, ChevronDown, Check, Lock, Terminal, Key } from 'lucide-react';
 import { GlitchText } from '../components/GlitchText';
 import { UserData } from '../types';
 
@@ -14,6 +14,7 @@ export const EntryView: React.FC<EntryViewProps> = ({ onSubmit }) => {
   const progressBarRef = useRef<HTMLDivElement>(null);
   
   const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   const [hasReadDisclaimer, setHasReadDisclaimer] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
   const [scrolledPercent, setScrolledPercent] = useState(0);
@@ -34,6 +35,7 @@ export const EntryView: React.FC<EntryViewProps> = ({ onSubmit }) => {
         x: -20,
         opacity: 0,
         duration: 0.6,
+        stagger: 0.1,
         ease: "power2.out",
       }, "-=0.5")
       .from(".disclaimer-container", {
@@ -72,8 +74,9 @@ export const EntryView: React.FC<EntryViewProps> = ({ onSubmit }) => {
   };
 
   useEffect(() => {
-    setCanSubmit(name.length > 2 && hasReadDisclaimer);
-  }, [name, hasReadDisclaimer]);
+    const isPasswordValid = password === 'FARMLEYXNAWF26';
+    setCanSubmit(name.length > 2 && hasReadDisclaimer && isPasswordValid);
+  }, [name, password, hasReadDisclaimer]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,7 +112,7 @@ export const EntryView: React.FC<EntryViewProps> = ({ onSubmit }) => {
               <h2 className="font-mono text-sm tracking-[0.2em] uppercase opacity-70">NAWF Identity Access</h2>
             </div>
 
-            <div className="cyber-input-group space-y-2 mb-8">
+            <div className="cyber-input-group space-y-2 mb-6">
               <label htmlFor="name" className="block font-mono text-xs text-cyber-secondary uppercase tracking-widest">
                 Visitor Name
               </label>
@@ -120,18 +123,40 @@ export const EntryView: React.FC<EntryViewProps> = ({ onSubmit }) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="ENTER FULL NAME..."
-                className="w-full bg-cyber-dark/50 border-b-2 border-cyber-primary/20 focus:border-cyber-primary text-cyber-text font-sans text-2xl py-2 px-1 outline-none transition-colors placeholder-white/10"
+                className="w-full bg-cyber-dark/50 border-b-2 border-cyber-primary/20 focus:border-cyber-primary text-cyber-text font-sans text-xl py-2 px-1 outline-none transition-colors placeholder-white/10"
               />
+            </div>
+
+            <div className="cyber-input-group space-y-2 mb-8">
+              <label htmlFor="password" className="block font-mono text-xs text-cyber-secondary uppercase tracking-widest">
+                Access Code
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete="off"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••••••"
+                  className="w-full bg-cyber-dark/50 border-b-2 border-cyber-primary/20 focus:border-cyber-primary text-cyber-text font-sans text-xl py-2 px-1 outline-none transition-colors placeholder-white/10 tracking-widest"
+                />
+                <Key className="absolute right-2 top-2 text-cyber-primary/30 w-4 h-4" />
+              </div>
             </div>
           </div>
 
           <div className="space-y-4">
              <div className="flex items-center gap-3 text-xs font-mono text-gray-500">
-                <div className={`w-3 h-3 rounded-full ${name.length > 2 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]' : 'bg-red-900'}`} />
+                <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${name.length > 2 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]' : 'bg-red-900'}`} />
                 <span>NAME_VALIDATION</span>
              </div>
              <div className="flex items-center gap-3 text-xs font-mono text-gray-500">
-                <div className={`w-3 h-3 rounded-full ${hasReadDisclaimer ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]' : 'bg-red-900'}`} />
+                <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${password === 'FARMLEYXNAWF26' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]' : 'bg-red-900'}`} />
+                <span>SECURITY_CLEARANCE</span>
+             </div>
+             <div className="flex items-center gap-3 text-xs font-mono text-gray-500">
+                <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${hasReadDisclaimer ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]' : 'bg-red-900'}`} />
                 <span>NDA_ACKNOWLEDGEMENT</span>
              </div>
           </div>
