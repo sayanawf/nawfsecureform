@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { UserData } from '../types';
 import { GlitchText } from '../components/GlitchText';
-import { CheckCircle, Globe, ArrowRight } from 'lucide-react';
+import { CheckCircle, Globe, ArrowRight, Lock } from 'lucide-react';
 
 interface SuccessViewProps {
   userData: UserData;
@@ -44,7 +44,15 @@ export const SuccessView: React.FC<SuccessViewProps> = ({ userData }) => {
   }, []);
 
   const handleRedirect = () => {
-    window.location.href = 'https://farmleypitchbynawf.netlify.app';
+    // BASE URL for the destination
+    const baseUrl = 'https://farmleypitchbynawf.netlify.app';
+    
+    // Attach the secure one-time token
+    const finalUrl = userData.token 
+      ? `${baseUrl}?token=${encodeURIComponent(userData.token)}`
+      : baseUrl;
+
+    window.location.href = finalUrl;
   };
 
   return (
@@ -78,6 +86,11 @@ export const SuccessView: React.FC<SuccessViewProps> = ({ userData }) => {
               <div className="text-xs font-mono text-gray-500 uppercase">Destination</div>
               <div className="text-lg font-sans font-semibold text-blue-100">Farmley's Teaser Proposal</div>
             </div>
+          </div>
+          
+          <div className="flex items-center gap-2 mb-6 text-[10px] font-mono text-green-400">
+            <Lock size={10} />
+            <span>SECURE_TOKEN_GENERATED: {userData.token ? userData.token.substring(0, 8) + '...' : 'PENDING'}</span>
           </div>
           
           <button 
