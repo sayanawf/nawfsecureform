@@ -7,7 +7,7 @@ import { AppState, UserData } from './types';
 import { GlitchText } from './components/GlitchText';
 
 // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLgYJrydpv23D4vyCZUYJ52vyPEmFU-VhIn5CXpvgNfs70ROQKujaOB6DLKkmnJG8k5g/exec"; 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyT3zFKepEFlzfLNB9n_FqJrsVt2kqDn3WhvFfZXuJrUAlu9v0iXORl1ehBMOX2zFT5/exec"; 
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(AppState.INTRO);
@@ -24,34 +24,46 @@ const App: React.FC = () => {
   }, [appState]);
 
   const handleFormSubmit = async (data: UserData) => {
-    setUserData(data);
+    // 1. Set state to submitting
     setAppState(AppState.SUBMITTING);
     
     try {
+      let token = "";
+
       if (GOOGLE_SCRIPT_URL) {
-        // We use mode: 'no-cors' to allow the browser to send data to Google Scripts.
-        // We use 'text/plain' to ensure the data is sent as a simple string body, 
-        // which prevents CORS preflight issues and ensures Apps Script receives it in e.postData.contents.
-        await fetch(GOOGLE_SCRIPT_URL, {
+        // 2. Send data to Google Script
+        // We removed 'no-cors' because we MUST read the response to get the token.
+        // Google Apps Script must be deployed as "Anyone" for this to work without CORS errors.
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors", 
           headers: {
-            "Content-Type": "text/plain",
+            "Content-Type": "text/plain", // Keep text/plain to avoid preflight OPTIONS request
           },
           body: JSON.stringify({ name: data.name }),
         });
+
+        // 3. Extract the token from the response
+        const result = await response.json();
+        if (result && result.token) {
+          token = result.token;
+        }
       } else {
-        console.warn("GOOGLE_SCRIPT_URL is empty. Data was not sent to Sheets.");
+        console.warn("GOOGLE_SCRIPT_URL is empty. Running in demo mode.");
+        token = "DEMO-TOKEN-" + Math.random().toString(36).substring(7);
       }
+
+      // 4. Update user data with the received token
+      setUserData({ ...data, token });
+
+      // 5. Proceed to success
+      setAppState(AppState.SUCCESS);
+
     } catch (error) {
       console.error("Transmission Failed:", error);
-      // We proceed to success anyway so the user experience isn't broken
-    }
-    
-    // Maintain the high-tech delay effect
-    setTimeout(() => {
+      // Fallback: Still allow entry but without a valid token (Website 2 will block this)
+      setUserData({ ...data, token: "INVALID_TRANSMISSION" });
       setAppState(AppState.SUCCESS);
-    }, 1500);
+    }
   };
 
   return (
