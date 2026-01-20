@@ -1,6 +1,7 @@
 export interface UserData {
   name: string;
   acceptedDisclaimer: boolean;
+  token?: string;
 }
 
 export enum AppState {
