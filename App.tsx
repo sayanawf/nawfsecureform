@@ -32,20 +32,24 @@ const App: React.FC = () => {
 
       if (GOOGLE_SCRIPT_URL) {
         // 2. Send data to Google Script
-        // We removed 'no-cors' because we MUST read the response to get the token.
-        // Google Apps Script must be deployed as "Anyone" for this to work without CORS errors.
+        // We include name AND accessCode so the admin knows which deck was accessed
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           headers: {
-            "Content-Type": "text/plain", // Keep text/plain to avoid preflight OPTIONS request
+            "Content-Type": "text/plain", 
           },
-          body: JSON.stringify({ name: data.name }),
+          body: JSON.stringify({ 
+            name: data.name,
+            accessCode: data.accessCode // Sending the password used
+          }),
         });
 
         // 3. Extract the token from the response
         const result = await response.json();
         if (result && result.token) {
           token = result.token;
+        } else {
+           throw new Error("No token received from server");
         }
       } else {
         console.warn("GOOGLE_SCRIPT_URL is empty. Running in demo mode.");
@@ -60,7 +64,9 @@ const App: React.FC = () => {
 
     } catch (error) {
       console.error("Transmission Failed:", error);
-      // Fallback: Still allow entry but without a valid token (Website 2 will block this)
+      alert("⚠️ CONNECTION ERROR: Could not reach Google Script.\n\nPlease check that you deployed your Google Script as a 'New Version' and set access to 'Anyone'.");
+      
+      // Fallback: Still allow entry but without a valid token
       setUserData({ ...data, token: "INVALID_TRANSMISSION" });
       setAppState(AppState.SUCCESS);
     }
