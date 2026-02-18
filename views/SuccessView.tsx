@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { UserData } from '../types';
 import { GlitchText } from '../components/GlitchText';
-import { CheckCircle, Globe, ArrowRight, Lock } from 'lucide-react';
+import { CheckCircle, Globe, ArrowRight, Lock, AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface SuccessViewProps {
   userData: UserData;
@@ -11,6 +11,8 @@ interface SuccessViewProps {
 export const SuccessView: React.FC<SuccessViewProps> = ({ userData }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const circleRef = useRef<HTMLDivElement>(null);
+
+  const hasError = userData.token === 'INVALID_TRANSMISSION' || !userData.token;
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -44,8 +46,13 @@ export const SuccessView: React.FC<SuccessViewProps> = ({ userData }) => {
   }, []);
 
   const handleRedirect = () => {
-    // BASE URL for the destination
-    const baseUrl = 'https://farmleypitchbynawf.netlify.app';
+    if (hasError) {
+      window.location.reload();
+      return;
+    }
+
+    // Use the destination mapped to the specific access code, fallback to default if missing
+    const baseUrl = userData.destinationUrl || 'https://farmleypitchbynawf.netlify.app';
     
     // Attach the secure one-time token
     const finalUrl = userData.token 
@@ -61,45 +68,69 @@ export const SuccessView: React.FC<SuccessViewProps> = ({ userData }) => {
       {/* Explosive Circle Animation Element */}
       <div 
         ref={circleRef} 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-cyber-primary rounded-full blur-sm z-0 pointer-events-none" 
+        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full blur-sm z-0 pointer-events-none ${hasError ? 'bg-red-600' : 'bg-cyber-primary'}`} 
       />
 
       <div className="z-10 text-center space-y-6">
-        <div className="success-text text-cyber-primary mb-2">
-          <CheckCircle size={80} className="mx-auto animate-pulse" />
+        <div className={`success-text mb-2 ${hasError ? 'text-red-500' : 'text-cyber-primary'}`}>
+          {hasError ? (
+            <AlertTriangle size={80} className="mx-auto animate-pulse" />
+          ) : (
+            <CheckCircle size={80} className="mx-auto animate-pulse" />
+          )}
         </div>
         
-        <h1 className="success-text font-sans text-6xl md:text-8xl font-bold text-white tracking-tighter uppercase">
-          Authorization Verified
+        <h1 className="success-text font-sans text-5xl md:text-8xl font-bold text-white tracking-tighter uppercase">
+          {hasError ? 'TRANSMISSION FAILED' : 'Authorization Verified'}
         </h1>
         
-        <div className="success-text font-mono text-xl text-cyber-secondary tracking-[0.5em]">
-          WELCOME {userData.name.toUpperCase()}
+        <div className={`success-text font-mono text-xl tracking-[0.5em] ${hasError ? 'text-red-400' : 'text-cyber-secondary'}`}>
+          {hasError ? 'SECURE HANDSHAKE DROPPED' : `WELCOME ${userData.name.toUpperCase()}`}
         </div>
 
-        <div className="redirect-panel mt-16 p-8 border border-white/10 bg-black/40 backdrop-blur-xl rounded-lg max-w-md mx-auto">
+        <div className={`redirect-panel mt-16 p-8 border backdrop-blur-xl rounded-lg max-w-md mx-auto ${hasError ? 'border-red-500/30 bg-red-900/20' : 'border-white/10 bg-black/40'}`}>
           <div className="flex items-center gap-4 mb-4 text-left">
-            <div className="p-3 bg-blue-500/10 rounded-lg">
-              <Globe className="text-blue-400" />
+            <div className={`p-3 rounded-lg ${hasError ? 'bg-red-500/10' : 'bg-blue-500/10'}`}>
+              <Globe className={hasError ? 'text-red-400' : 'text-blue-400'} />
             </div>
             <div>
               <div className="text-xs font-mono text-gray-500 uppercase">Destination</div>
-              <div className="text-lg font-sans font-semibold text-blue-100">Farmley's Teaser Proposal</div>
+              <div className={`text-lg font-sans font-semibold ${hasError ? 'text-red-100' : 'text-blue-100'}`}>
+                {hasError ? 'Connection Error' : "Accessing Secure Deck..."}
+              </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 mb-6 text-[10px] font-mono text-green-400">
+          <div className={`flex items-center gap-2 mb-6 text-[10px] font-mono ${hasError ? 'text-red-400' : 'text-green-400'}`}>
             <Lock size={10} />
-            <span>SECURE_TOKEN_GENERATED: {userData.token ? userData.token.substring(0, 8) + '...' : 'PENDING'}</span>
+            <span>
+              {hasError 
+                ? 'ERROR: GOOGLE SCRIPT NOT REACHABLE' 
+                : `SECURE_TOKEN_GENERATED: ${userData.token ? userData.token.substring(0, 8) + '...' : 'PENDING'}`}
+            </span>
           </div>
           
           <button 
             onClick={handleRedirect}
-            className="w-full group relative flex items-center justify-between px-6 py-4 bg-white text-black font-bold font-mono overflow-hidden transition-all hover:bg-cyber-primary hover:text-black"
+            className={`w-full group relative flex items-center justify-between px-6 py-4 font-bold font-mono overflow-hidden transition-all
+              ${hasError 
+                ? 'bg-red-600 text-white hover:bg-red-700' 
+                : 'bg-white text-black hover:bg-cyber-primary hover:text-black'}
+            `}
           >
-            <span className="relative z-10">PROCEED TO DECK</span>
-            <ArrowRight className="relative z-10 group-hover:translate-x-1 transition-transform" />
+            <span className="relative z-10">{hasError ? 'RETRY CONNECTION' : 'PROCEED TO DECK'}</span>
+            {hasError ? (
+              <RefreshCw className="relative z-10 group-hover:rotate-180 transition-transform" />
+            ) : (
+              <ArrowRight className="relative z-10 group-hover:translate-x-1 transition-transform" />
+            )}
           </button>
+
+          {hasError && (
+             <div className="mt-4 text-[10px] text-red-300 font-mono text-left leading-relaxed">
+               <strong>DEBUG TIP:</strong> Check your Google Apps Script Deployment. Ensure you selected "New Deployment" and access is set to "Anyone".
+             </div>
+          )}
         </div>
       </div>
     </div>
