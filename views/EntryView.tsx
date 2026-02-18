@@ -4,6 +4,14 @@ import { ShieldAlert, ChevronDown, Check, Lock, Terminal, Key } from 'lucide-rea
 import { GlitchText } from '../components/GlitchText';
 import { UserData } from '../types';
 
+// --- CONFIGURATION: MAP ACCESS CODES TO WEBSITES ---
+const ACCESS_ROUTES: Record<string, string> = {
+  // CODE : DESTINATION URL
+  'FARMLEYXNAWF26': 'https://farmleypitchbynawf.netlify.app',
+  'NAWF2024': 'https://www.google.com', // Example 2
+  'SECRET_DECK': 'https://www.bing.com', // Example 3
+};
+
 interface EntryViewProps {
   onSubmit: (data: UserData) => void;
 }
@@ -74,13 +82,17 @@ export const EntryView: React.FC<EntryViewProps> = ({ onSubmit }) => {
   };
 
   useEffect(() => {
-    const isPasswordValid = password === 'FARMLEYXNAWF26';
-    setCanSubmit(name.length > 2 && hasReadDisclaimer && isPasswordValid);
+    // Check if the entered password exists in our list
+    const isValidCode = ACCESS_ROUTES.hasOwnProperty(password);
+    setCanSubmit(name.length > 2 && hasReadDisclaimer && isValidCode);
   }, [name, password, hasReadDisclaimer]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (canSubmit) {
+      // Get the destination URL based on the password
+      const destinationUrl = ACCESS_ROUTES[password];
+
       // Exit animation
       const ctx = gsap.context(() => {
         gsap.to(containerRef.current, {
@@ -89,7 +101,12 @@ export const EntryView: React.FC<EntryViewProps> = ({ onSubmit }) => {
           filter: "blur(10px)",
           duration: 0.8,
           ease: "power4.in",
-          onComplete: () => onSubmit({ name, acceptedDisclaimer: true })
+          onComplete: () => onSubmit({ 
+            name, 
+            acceptedDisclaimer: true,
+            destinationUrl: destinationUrl,
+            accessCode: password
+          })
         });
       }, containerRef);
     }
@@ -152,7 +169,7 @@ export const EntryView: React.FC<EntryViewProps> = ({ onSubmit }) => {
                 <span>NAME_VALIDATION</span>
              </div>
              <div className="flex items-center gap-3 text-xs font-mono text-gray-500">
-                <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${password === 'FARMLEYXNAWF26' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]' : 'bg-red-900'}`} />
+                <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${ACCESS_ROUTES.hasOwnProperty(password) ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]' : 'bg-red-900'}`} />
                 <span>SECURITY_CLEARANCE</span>
              </div>
              <div className="flex items-center gap-3 text-xs font-mono text-gray-500">
