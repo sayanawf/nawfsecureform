@@ -8,7 +8,7 @@ import { UserData } from '../types';
 const ACCESS_ROUTES: Record<string, string> = {
   // CODE : DESTINATION URL
   'FARMLEYXNAWF26': 'https://farmleypitchbynawf.netlify.app',
-  'NAWF2024': 'https://www.google.com', // Example 2
+  'LAHORIXNAWF26': 'https://lahorixnawf.netlify.app', // Example 2
   'SECRET_DECK': 'https://www.bing.com', // Example 3
 };
 
